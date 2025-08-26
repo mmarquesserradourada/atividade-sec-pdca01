@@ -48,10 +48,15 @@ Criar boas práticas de segurança (citar detalhadamente quais são).
 ## Subir versão corrigida para o GitHub respondendo abaixo os itens:
 
 Questionário para os alunos
+
 Quais vulnerabilidades você encontrou no código original?
+
 Qual vulnerabilidade apresentou maior risco (P x I)?
+
 Qual seria o impacto real se essa falha fosse explorada em uma empresa?
+
 Como você corrige as falhas encontradas?
+
 Após aplicar o PDCA, quais melhorias foram efetivas?
 
 ## Vocês Alunos deverão fazer:
