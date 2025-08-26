@@ -3,6 +3,7 @@ Atividade Aula Segurança 01 - Faculdade Serra Dourada Lorena
 
 Código a ser analisado em python!
 
+<pre>
 usuarios = {
     "admin": "123456",  
     "joao": "senha",
@@ -20,6 +21,8 @@ if __name__ == "__main__":
     user = input("Usuário: ")
     pwd = input("Senha: ")
     print(login(user, pwd))
+</pre>
+
 
 # O que tem que ser feito
 Aplicação do PDCA
