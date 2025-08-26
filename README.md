@@ -26,6 +26,7 @@ if __name__ == "__main__":
 
 # O que tem que ser feito
 Aplicação do PDCA
+
 🔹 Plan (Planejar)
 Identificar vulnerabilidades no código acima.
 Analisar riscos (Probabilidade x Impacto) de exploração.
