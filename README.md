@@ -56,6 +56,9 @@ Após aplicar o PDCA, quais melhorias foram efetivas?
 
 ## Vocês Alunos deverão fazer:
 Fork: O aluno faz um "fork" do seu repositório. Isso cria uma cópia completa do seu projeto na conta dele. O repositório original é chamado de "upstream" e a cópia do aluno é o "origin".
+
 Clone e Trabalho: O aluno clona a cópia dele (o "origin") para a máquina local e faz as alterações no código.
+
 Commit e Push: Após as alterações, o aluno faz um "commit" e envia (push) as mudanças para o repositório dele no GitHub.
+
 Pull Request: O aluno abre um Pull Request do repositório dele (o "origin") para o seu repositório original (o "upstream").
