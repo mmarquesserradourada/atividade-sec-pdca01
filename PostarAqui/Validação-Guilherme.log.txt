@@ -1,0 +1,142 @@
+###############################################################
+
+ATIVIDADE 01 - ANÁLISE DE SEGURANÇA PDCA
+###############################################################
+
+NOME: Guilherme Damas
+DATA: 30/08/2025
+
+### Tabela de Análise de Riscos
+
+| ID  | Vulnerabilidade                                | Probabilidade | Impacto | Risco (P x I) | Nível de Risco |
+| :-- | :--------------------------------------------- | :-----------: | :-----: | :-----------: | :------------- |
+| V01 | Credenciais em Texto Claro no Código          |       5       |    5    |      25       | **Crítico** |
+| V02 | Ausência de Hashing de Senha                   |       5       |    5    |      25       | **Crítico** |
+| V03 | Ausência de Proteção contra Força Bruta        |       4       |    4    |      16       | **Alto** |
+| V04 | Comparação Insegura (Timing Attack)            |       2       |    4    |       8       | **Médio** |
+
+**Legenda:**
+* **Probabilidade e Impacto:** Escala de 1 (Baixo) a 5 (Crítico).
+* **Risco:** Calculado como `Probabilidade x Impacto`.
+
+=-=-= Código Corrigido =-=-=
+
+import hashlib
+import os
+import hmac
+import re
+
+def hash_password(password, salt=None):
+    """Gera um hash salgado para uma senha."""
+    if salt is None:
+        salt = os.urandom(16)
+    pwd_hash = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt,
+        100000
+    )
+    return salt, pwd_hash
+
+def verify_password(stored_salt, stored_hash, provided_password):
+    """Verifica se a senha fornecida corresponde ao hash armazenado."""
+    _, pwd_hash = hash_password(provided_password, stored_salt)
+    return hmac.compare_digest(stored_hash, pwd_hash)
+
+def validar_forca_senha(senha):
+    """Verifica se uma senha atende aos critérios de segurança."""
+    if len(senha) < 8:
+        return "Erro: A senha deve ter no mínimo 8 caracteres."
+    if not re.search(r"[a-z]", senha):
+        return "Erro: A senha deve conter pelo menos uma letra minúscula."
+    if not re.search(r"[A-Z]", senha):
+        return "Erro: A senha deve conter pelo menos uma letra maiúscula."
+    if not re.search(r"\d", senha):
+        return "Erro: A senha deve conter pelo menos um número."
+    if not re.search(r"[@$!%*?&#]", senha):
+        return "Erro: A senha deve conter pelo menos um caractere especial (@, $, !, etc.)."
+    return True
+    
+def registrar_usuario(usuario, usuarios_db):
+    """Realiza o processo de registro de um novo usuário."""
+    if usuario in usuarios_db:
+        print("\n[!] Este nome de usuário já existe. Tente outro.")
+        return
+
+    while True:
+        print("\n(AVISO: Em compiladores online, a senha pode ficar visível ao digitar.)")
+        senha = input(f"Crie uma senha para o usuário '{usuario}': ")
+        
+        validacao = validar_forca_senha(senha)
+        if validacao is not True:
+            print(f"\n[!] Senha fraca! {validacao}")
+            continue
+
+        confirmacao_senha = input("Confirme a senha: ")
+
+        if senha != confirmacao_senha:
+            print("\n[!] As senhas não coincidem. Tente novamente.")
+            continue
+        
+        salt, pwd_hash = hash_password(senha)
+        usuarios_db[usuario] = {"salt": salt, "hash": pwd_hash}
+        print(f"\n[✓] Usuário '{usuario}' registrado com sucesso!")
+        break
+
+def login_seguro(usuario, senha, usuarios_db):
+    """Função de login que utiliza o sistema de hash seguro."""
+    if usuario in usuarios_db:
+        user_data = usuarios_db[usuario]
+        if verify_password(user_data["salt"], user_data["hash"], senha):
+            return f"[✓] Login bem-sucedido! Bem-vindo, {usuario}!"
+    
+    return "[!] Usuário ou senha inválidos."
+
+if __name__ == "__main__":
+    usuarios_seguros = {}
+    while True:
+        print("\n" + "="*30)
+        print("   SISTEMA DE LOGIN SEGURO")
+        print("="*30)
+        print("1. Fazer Login")
+        print("2. Registrar Novo Usuário")
+        print("3. Sair")
+        print("="*30)
+        
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == '1':
+            if not usuarios_seguros:
+                print("\n[!] Nenhum usuário cadastrado. Registre um usuário primeiro.")
+                continue
+            user = input("Usuário: ")
+            pwd = input("Senha: ")
+            print(login_seguro(user, pwd, usuarios_seguros))
+        
+        elif opcao == '2':
+            user = input("Digite o nome do novo usuário: ")
+            registrar_usuario(user, usuarios_seguros)
+
+        elif opcao == '3':
+            print("Saindo do sistema. Até logo!")
+            break
+        
+        else:
+            print("\n[!] Opção inválida. Por favor, escolha 1, 2 ou 3.")
+
+Respostas ao Questionário
+
+1. Quais vulnerabilidades você encontrou no código original?
+O código original tinha falhas críticas: as credenciais de acesso estavam escritas diretamente no código (hardcoded), as senhas eram salvas e comparadas como texto simples sem qualquer criptografia, e não havia nenhuma defesa contra ataques de força bruta ou de análise de tempo de resposta (timing attacks).
+
+2. Qual vulnerabilidade apresentou maior risco (P x I)?
+A vulnerabilidade mais perigosa foi o armazenamento de senhas em texto puro, que, combinada com a falta de hashing, atingiu o nível de risco Crítico (25). A facilidade de exploração era máxima (5/5) e o impacto seria o comprometimento total e imediato de todas as contas (5/5).
+
+3. Qual seria o impacto real se essa falha fosse explorada em uma empresa?
+Em um cenário corporativo, a exploração dessa falha levaria a consequências devastadoras, como vazamento de dados de clientes, perdas financeiras, sanções legais pela LGPD, danos irreparáveis à imagem da empresa e a possibilidade de o invasor usar o acesso para se mover lateralmente e atacar outros sistemas da rede.
+
+4. Como você corrige as falhas encontradas?
+As correções foram feitas substituindo o método inseguro de armazenamento por um sistema de hash com salt (PBKDF2). Além disso, criei um fluxo de registro que exige senhas complexas e usei uma função de comparação de tempo constante (hmac.compare_digest) para mitigar outros riscos.
+
+5. Após aplicar o PDCA, quais melhorias foram efetivas?
+As melhorias mais significativas foram a erradicação do risco de exposição de senhas e a mudança para uma postura de segurança proativa, que agora impede a criação de senhas fracas por padrão. O sistema se tornou fundamentalmente mais robusto e seguro.
